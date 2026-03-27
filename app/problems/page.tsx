@@ -38,8 +38,16 @@ export default function ProblemsPage() {
       <section>
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-4xl font-bold mb-2">Practice Problems</h1>
-            <p className="text-gray-400 text-lg">Master IBM i coding through specialized challenges.</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass border-[#5E6AD2]/20 mb-4 bg-[#5E6AD2]/5">
+               <Code2 className="w-3 h-3 text-[#5E6AD2]" />
+               <span className="text-[9px] font-black tracking-widest text-white uppercase">Mission Registry</span>
+            </div>
+            <h1 className="text-5xl font-black tracking-tighter text-white">
+              Practice <span className="text-[#5E6AD2] italic">Problems</span>.
+            </h1>
+            <p className="text-gray-500 font-medium text-lg mt-2">
+              Master IBM i coding through specialized engineering challenges.
+            </p>
           </div>
           
           <div className="flex items-center gap-3">
