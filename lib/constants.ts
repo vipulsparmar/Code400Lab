@@ -7,6 +7,9 @@ export const DIFFICULTY_COLORS: Record<string, string> = {
 export const LANGUAGE_LABELS: Record<string, string> = {
   RPGLE: "RPGLE (Free Format)",
   CLLE: "CLLE",
+  DB2_SQL: "DB2 for i (SQL)",
+  SQLRPGLE: "SQLRPGLE (Embedded SQL)",
+  DDS: "DDS (File Specs)",
 };
 
 export const CATEGORIES = [

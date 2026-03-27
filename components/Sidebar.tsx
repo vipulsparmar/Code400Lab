@@ -111,11 +111,16 @@ export default function Sidebar({ isExpanded, onToggle }: SidebarProps) {
           <p className="text-[10px] text-gray-500 mb-2 font-black uppercase tracking-widest">Daily Streak</p>
           <div className="flex items-center gap-2">
             <Zap className="text-[#5E6AD2] w-4 h-4" />
-            <span className="text-lg font-bold text-white">12 Days</span>
+            <span className="text-lg font-bold text-white">{(session?.user as any)?.streak || 0} Days</span>
           </div>
+
           <div className="mt-3 w-full h-1 bg-[rgba(255,255,255,0.05)] rounded-full overflow-hidden">
-            <div className="w-2/3 h-full bg-[#5E6AD2]" />
+            <div 
+              className="h-full bg-[#5E6AD2] transition-all duration-1000 ease-out" 
+              style={{ width: `${Math.min((((session?.user as any)?.streak || 0) % 30) / 30 * 100, 100)}%` }}
+            />
           </div>
+
         </div>
       </div>
 
