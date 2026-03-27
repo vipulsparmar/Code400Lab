@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+
+
+model Problem {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  difficulty   String   // Easy, Medium, Hard
+  language     String   // RPGLE, CLLE
+  category     String
+  description  String
+  inputFormat  String
+  outputFormat String
+  sampleInput  String
+  sampleOutput String
+  starterCode  String
+  hints        String   @default("")
+  tags         String   @default("") // comma separated
+  solveCount   Int      @default(0)
+  attemptCount Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  submissions  Submission[]
+  testCases    TestCase[]
+}
+
+model TestCase {
+  id        String  @id @default(cuid())
+  problemId String
+  input     String
+  expected  String
+  isHidden  Boolean @default(false)
+
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+model Submission {
+  id        String   @id @default(cuid())
+  problemId String
+  userId    String   @default("anonymous")
+  code      String
+  language  String
+  status    String   // Accepted, Wrong Answer, etc.
+  runtime   Int      @default(0) // ms
+  points    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  problem   Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id          String   @id @default(cuid())
+  username    String   @unique
+  displayName String
+  avatar      String   @default("")
+  points      Int      @default(0)
+  rank        String   @default("Beginner")
+  streak      Int      @default(0)
+  solved      Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
