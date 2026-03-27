@@ -17,6 +17,7 @@ import {
   LayoutDashboard
 } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { DIFFICULTY_COLORS } from "@/lib/constants";
 
 export default function ProblemDetailPage() {
@@ -79,13 +80,56 @@ export default function ProblemDetailPage() {
     }
   };
 
+  const [leftPanelWidth, setLeftPanelWidth] = useState(40);
+  const [isResizing, setIsResizing] = useState(false);
+
+  const startResizing = () => setIsResizing(true);
+  const stopResizing = () => setIsResizing(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizing) return;
+      
+      const container = document.getElementById('problem-workspace');
+      if (!container) return;
+      
+      const rect = container.getBoundingClientRect();
+      const relativeX = e.clientX - rect.left;
+      const percentage = (relativeX / rect.width) * 100;
+      const remainingWidth = rect.width - relativeX;
+      
+      // Boundary Guard: Ensure Left panel is > 20% AND Right panel is > 550px
+      if (percentage > 20 && remainingWidth > 550) {
+         setLeftPanelWidth(percentage);
+      }
+    };
+
+    
+    if (isResizing) {
+       window.addEventListener("mousemove", handleMouseMove);
+       window.addEventListener("mouseup", stopResizing);
+    }
+    
+    return () => {
+       window.removeEventListener("mousemove", handleMouseMove);
+       window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [isResizing]);
+
   if (!problem) return null;
 
+
   return (
-    <div className="flex h-screen overflow-hidden -m-8">
+    <div id="problem-workspace" className={`flex h-screen overflow-hidden ${isResizing ? "select-none cursor-col-resize" : ""}`}>
+
       {/* Left Panel: Problem Info */}
-      <div className="w-[40%] flex flex-col border-r border-[rgba(255,255,255,0.08)] bg-[#0A0A0A]">
+
+      <div 
+        className="flex flex-col border-r border-[rgba(255,255,255,0.08)] bg-[#0A0A0A]"
+        style={{ width: `${leftPanelWidth}%` }}
+      >
         <div className="p-6 border-b border-[rgba(255,255,255,0.05)]">
+
           <Link href="/problems" className="flex items-center gap-2 text-xs font-bold text-gray-500 hover:text-white transition-colors mb-4 group tracking-widest uppercase">
             <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
             BACK TO PROBLEMS
@@ -100,20 +144,51 @@ export default function ProblemDetailPage() {
           <h1 className="text-2xl font-bold text-white">{problem.title}</h1>
         </div>
 
-        <div className="flex items-center gap-6 px-6 py-3 border-b border-[rgba(255,255,255,0.05)] text-xs font-bold tracking-widest text-gray-400">
-          {["description", "editorial", "submissions", "discussion"].map((tab) => (
-            <button 
-              key={tab} 
-              onClick={() => setActiveTab(tab)}
-              className={`hover:text-white transition-colors pb-1 border-b-2 ${activeTab === tab ? "text-white border-[#5E6AD2]" : "border-transparent"}`}
-            >
-              {tab.toUpperCase()}
-            </button>
-          ))}
+        <div className="flex items-center gap-6 px-6 py-3 border-b border-[rgba(255,255,255,0.05)] text-xs font-bold tracking-widest text-gray-400 relative">
+          {["description", "editorial", "submissions", "discussion"].map((tab, idx) => {
+            const tabs = ["description", "editorial", "submissions", "discussion"];
+            // Each tab is approx 80-100px with the gap. 
+            // We'll use a simple relative mapping for the shared bar.
+            return (
+              <button 
+                key={tab} 
+                onClick={() => setActiveTab(tab)}
+                className={`hover:text-white transition-colors relative z-10 pb-1 uppercase tracking-[0.2em] font-black ${activeTab === tab ? "text-white" : ""}`}
+              >
+                {tab}
+              </button>
+            );
+          })}
+          
+          {/* Shared Sliding Indicator */}
+          <div 
+            className="absolute bottom-0 h-[2px] bg-[#5E6AD2] transition-all duration-300 ease-in-out shadow-[0_0_15px_rgba(94,106,210,0.4)]"
+            style={{
+              left: activeTab === "description" ? "24px" : 
+                    activeTab === "editorial" ? "145px" : 
+                    activeTab === "submissions" ? "250px" : "385px",
+              width: activeTab === "description" ? "105px" : 
+                     activeTab === "editorial" ? "80px" : 
+                     activeTab === "submissions" ? "110px" : "105px"
+            }}
+          />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 animate-fade-in custom-scrollbar">
-          {activeTab === "description" ? (
+
+
+        <div className="flex-1 overflow-y-scroll custom-scrollbar min-h-full bg-white/[0.01]">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+              transition={{ duration: 0.5, ease: [0.2, 0, 0, 1] }}
+              className="p-6 space-y-8"
+            >
+
+              {activeTab === "description" ? (
+
             <>
               <div>
                 <h3 className="text-sm font-bold text-white mb-2 uppercase tracking-wide">Task Description</h3>
@@ -295,13 +370,26 @@ export default function ProblemDetailPage() {
                )}
             </div>
           )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  </div>
 
 
-        </div>
+      {/* Resizer Handle */}
+      <div 
+        onMouseDown={startResizing}
+        className={`w-1.5 h-full cursor-col-resize transition-all hover:bg-[#5E6AD2]/40 active:bg-[#5E6AD2] relative z-50 -ml-[0.75px] -mr-[0.75px] group`}
+      >
+         <div className="absolute inset-y-0 left-1/2 w-[1px] bg-[rgba(255,255,255,0.05)] group-hover:bg-[#5E6AD2]/50" />
       </div>
 
       {/* Right Panel: Code Editor */}
-      <div className="flex-1 flex flex-col bg-[#1E1E1E]">
+      <div className="flex-1 min-w-[550px] flex flex-col bg-[#1E1E1E]">
+
+
+
+
         <CodeEditor 
           language={problem.language} 
           defaultValue={problem.starterCode} 

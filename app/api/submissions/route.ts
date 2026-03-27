@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { validateSubmission } from "@/lib/validator";
 import { reviewSubmissionWithAI } from "@/lib/ai";
 
-
 export async function POST(request: Request) {
   try {
-    const { problemId, code, language, userId = "anonymous" } = await request.json();
+    const session = await getServerSession(authOptions);
+    const body = await request.json();
+    const { problemId, code, language } = body;
+    
+    // Prioritize session user, fallback to manual for legacy or guest
+    const userId = session?.user && (session.user as any).id ? (session.user as any).id : (body.userId || "anonymous");
 
     if (!problemId || !code || !language) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -35,7 +41,6 @@ export async function POST(request: Request) {
       `Input: ${problem.sampleInput}, Output: ${problem.sampleOutput}`
     );
 
-
     // Final result: must pass structural checks AND AI judge
     const finalPassed = validation.passed && aiReview?.isCorrect;
 
@@ -63,10 +68,9 @@ export async function POST(request: Request) {
     return NextResponse.json({
       id: submission.id,
       ...validation,
-      passed: finalPassed, // Final verdict from AI
+      passed: finalPassed, 
       aiReview,
     });
-
 
   } catch (error) {
     console.error("Submission error:", error);

@@ -101,10 +101,25 @@ code, pre {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { 
+    opacity: 0; 
+    transform: translateY(4px); 
+    filter: blur(4px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+    filter: blur(0);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+  will-change: transform, opacity, filter;
 }
+
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+

@@ -74,10 +74,11 @@ export default function ProblemsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
-              {filteredProblems.map((problem) => (
+              {filteredProblems.map((problem, i) => (
 
                 <tr key={problem.id} className="group hover:bg-[rgba(255,255,255,0.02)] transition-colors cursor-pointer">
-                  <td className="px-8 py-5 font-mono text-xs text-gray-500">{problem.id}</td>
+                  <td className="px-8 py-5 font-mono text-xs text-gray-500">{i + 1}</td>
+
                   <td className="px-4 py-5">
                     <Link href={`/problems/${problem.id}`} className="font-semibold text-white group-hover:text-[#5E6AD2] transition-colors">
                       {problem.title}
@@ -114,12 +115,9 @@ export default function ProblemsPage() {
         </div>
       </section>
 
-      <div className="flex justify-center p-12">
-        <button className="flex items-center gap-3 px-8 py-4 rounded-full glass border-[#5E6AD2]/20 hover:border-[#5E6AD2]/50 hover:bg-[#5E6AD2]/10 transition-all font-bold group animate-transition-bounce">
-          <Zap className="w-5 h-5 text-[#5E6AD2] fill-[#5E6AD2]" />
-          <span>AI GENERATE NEW CHALLENGE</span>
-        </button>
-      </div>
     </div>
   );
 }
+
+
+

@@ -5,15 +5,16 @@ export async function GET() {
   try {
     const users = await prisma.user.findMany({
       orderBy: { points: "desc" },
-      take: 50,
+      take: 20,
       select: {
+        id: true,
+        name: true,
         username: true,
-        displayName: true,
         points: true,
         rank: true,
         solved: true,
         streak: true,
-        avatar: true,
+        image: true,
       },
     });
 
