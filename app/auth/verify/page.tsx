@@ -44,6 +44,24 @@ function VerifyContent() {
     }
   };
 
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").trim().slice(0, 6).split("");
+    
+    // Check if the pasted content is alphanumeric/numeric (standard for OTPs)
+    if (pastedData.length > 0) {
+      const newCode = [...code];
+      pastedData.forEach((char, index) => {
+        if (index < 6) newCode[index] = char;
+      });
+      setCode(newCode);
+      
+      // Move focus to the last filled box or the next empty one
+      const nextIndex = Math.min(pastedData.length, 5);
+      inputRefs.current[nextIndex]?.focus();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -118,6 +136,7 @@ function VerifyContent() {
                     value={digit}
                     onChange={(e) => handleChange(i, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(i, e)}
+                    onPaste={handlePaste}
                     className="w-12 h-14 text-center text-xl font-bold rounded-xl bg-white/[0.03] border border-white/[0.08] text-white focus:outline-none focus:border-[#5E6AD2]/60 focus:ring-2 focus:ring-[#5E6AD2]/20 transition-all focus:scale-110 shadow-lg"
                     placeholder="•"
                     required
