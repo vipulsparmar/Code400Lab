@@ -43,8 +43,7 @@ export const authOptions: NextAuthOptions = {
           role: user.role,
           streak: user.streak,
           points: user.points,
-          solved: user.solved,
-          image: user.image
+          solved: user.solved
         };
       }
     })
@@ -68,6 +67,9 @@ export const authOptions: NextAuthOptions = {
         token.points = (user as any).points;
         token.solved = (user as any).solved;
       }
+      // Security Sweep: Ensure no large base64 images ever enter the session headers
+      delete token.picture;
+      delete (token as any).image;
       return token;
     }
   },

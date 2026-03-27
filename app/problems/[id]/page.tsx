@@ -54,8 +54,8 @@ export default function ProblemDetailPage() {
           problemId: id,
           code,
           language: problem.language,
-          userId: "as400_master"
         }),
+
       });
 
       if (!response.ok) {
@@ -225,8 +225,9 @@ export default function ProblemDetailPage() {
                   <Zap className="w-4 h-4 fill-[#5E6AD2]" />
                   <span className="text-xs font-bold tracking-widest uppercase">Pro Tip</span>
                 </div>
-                <p className="text-xs text-gray-400 italic">"Use %DECH to handle half-adjust rounding if the business logic requires it for financial totals."</p>
+                <p className="text-xs text-gray-400 italic">"{problem.hints || "Focus on modern IBM i standards and clean-format syntax for optimal performance."}"</p>
               </div>
+
             </>
           ) : activeTab === "submissions" ? (
             <div className="space-y-4">
